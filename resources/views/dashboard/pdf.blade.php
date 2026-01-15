@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Voting Report</title>
+    <title>Laporan Pemilihan</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -48,31 +48,31 @@
 
 <body>
     <div class="header">
-        <h1>Voting Report</h1>
-        <p>Generated on: {{ $date }}</p>
+        <h1>Laporan Pemilihan</h1>
+        <p>Dibuat pada: {{ $date }}</p>
     </div>
 
     <div class="stats">
-        <h2>Voting Statistics</h2>
+        <h2>Statistik Pemilihan</h2>
         <div class="stat-card">
-            <strong>Total Voters:</strong> {{ $totalVoters }}
+            <strong>Total Pemilih:</strong> {{ $totalVoters }}
         </div>
         <div class="stat-card">
-            <strong>Voters Who Voted:</strong> {{ $votersWhoVoted }}
+            <strong>Pemilih yang Telah Memilih:</strong> {{ $votersWhoVoted }}
             ({{ round(($votersWhoVoted / $totalVoters) * 100, 2) }}%)
         </div>
         <div class="stat-card">
-            <strong>Voters Not Voted:</strong> {{ $votersNotVoted }}
+            <strong>Pemilih yang Belum Memilih:</strong> {{ $votersNotVoted }}
             ({{ round(($votersNotVoted / $totalVoters) * 100, 2) }}%)
         </div>
     </div>
 
-    <h2>Candidate Votes</h2>
+    <h2>Perolehan Suara Kandidat</h2>
     <table>
         <thead>
             <tr>
-                <th>Election Number</th>
-                <th>Total Votes</th>
+                <th>Nomor Pemilihan</th>
+                <th>Total Suara</th>
             </tr>
         </thead>
         <tbody>

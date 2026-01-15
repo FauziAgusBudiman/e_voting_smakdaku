@@ -134,20 +134,21 @@ class CandidateController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
-    {
-        $candidates = Candidate::findOrFail($id);
+    public function destroy($id)
+        {
+            $kandidat = Candidate::findOrFail($id);
 
-        if ($candidates->picture && Storage::exists($candidates->picture)) {
-            Storage::delete($candidates->picture);
+            // Hapus file dari storage jika ada
+            if ($kandidat->picture) {
+                Storage::disk('public')->delete($kandidat->picture);
+            }
+            if ($kandidat->resume) {
+                Storage::disk('public')->delete($kandidat->resume);
+            }
+
+            // Hapus data dari database
+            $kandidat->delete();
+
+            return redirect()->back()->with('success', 'Kandidat berhasil dihapus permanen.');
         }
-
-        if ($candidates->resume && Storage::exists($candidates->resume)) {
-            Storage::delete($candidates->resume);
-        }
-
-        $candidates->delete();
-
-        return redirect()->route('candidate.index')->with('message', 'Data Berhasil Dihapus!');
-    }
 }

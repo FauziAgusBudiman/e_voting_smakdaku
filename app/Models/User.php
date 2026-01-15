@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Observers\UserObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -15,26 +14,32 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $table = 'users';
-
     protected $primaryKey = 'id';
 
-    protected $fillable = ['name', 'email', 'password', 'role'];
+    /**
+     * Mass assignable attributes
+     */
+    protected $fillable = [
+        'name',
+        'email',     // opsional (admin)
+        'nisn',      // login utama siswa
+        'password',
+        'role',
+        'choice',
+    ];
 
+    /**
+     * Relasi ke kandidat yang dipilih (voting)
+     * choice → election_number
+     */
     public function candidate()
     {
         return $this->belongsTo(Candidate::class, 'choice', 'election_number');
     }
 
     /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
+     * Hidden attributes
      */
     protected $hidden = [
         'password',
@@ -42,11 +47,10 @@ class User extends Authenticatable
     ];
 
     /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
+     * Cast attributes
      */
     protected $casts = [
-        'email_verified_at' => 'datetime',
+        // email_verified_at DIHAPUS karena tidak ada di migrasi
+        // 'email_verified_at' => 'datetime',
     ];
 }

@@ -14,10 +14,20 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('email');
+
+            // Email tidak wajib (opsional / admin saja)
+            $table->string('email')->nullable();
+
+            // NISN wajib & unik (login utama siswa)
+            $table->string('nisn')->nullable()->unique();
+
             $table->string('password');
+
             $table->enum('role', ['admin', 'voter'])->default('voter');
+
+            // Menyimpan pilihan kandidat (opsional)
             $table->string('choice')->nullable();
+
             $table->timestamps();
         });
     }

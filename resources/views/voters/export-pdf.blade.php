@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Voters List</title>
+    <title>Daftar Pemilih</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -50,16 +50,17 @@
 </head>
 
 <body>
-    <h1>E-Voting - Voters List</h1>
-    <div class="date">Generated on: {{ $date }}</div>
+    <h1>DAFTAR FINAL PEMILIH</h1>
+    <div class="date">Dibuat: {{ $date }}</div>
 
     <table>
         <thead>
             <tr>
                 <th>No</th>
-                <th>Name</th>
+                <th>Nama</th>
                 <th>Email</th>
-                <th>Voting Status</th>
+                <th>NISN</th>
+                <th>Status Pemilihan</th>
             </tr>
         </thead>
         <tbody>
@@ -68,6 +69,7 @@
                     <td>{{ $voter->number }}</td>
                     <td>{{ $voter->name }}</td>
                     <td>{{ $voter->email }}</td>
+                    <td>{{ $voter->nisn }}</td>
                     <td>{{ $voter->status }}</td>
                 </tr>
             @endforeach
@@ -75,7 +77,7 @@
     </table>
 
     <div class="footer">
-        &copy; {{ date('Y') }} E-Voting. All rights reserved.
+        &copy; {{ date('Y') }} E-Voting. ASMAKDAKU.
     </div>
 </body>
 

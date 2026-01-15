@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\Candidate;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -17,75 +16,97 @@ class DatabaseSeeder extends Seeder
     {
         $faker = Faker::create();
 
-        // Create admin
+        /*
+        |--------------------------------------------------------------------------
+        | ADMIN
+        |--------------------------------------------------------------------------
+        */
         for ($i = 1; $i <= 2; $i++) {
             User::create([
                 'name' => "Admin $i",
                 'email' => "admin$i@gmail.com",
+                'nisn' => '12345678' . $i,
                 'password' => bcrypt('password'),
                 'role' => 'admin',
             ]);
         }
 
-        // Create candidates
-        $candidates = [['name' => 'Empty Box', 'election_number' => 1], ['name' => 'Alex Johnson - Richard Henry', 'election_number' => 2], ['name' => 'Sarah Smith - David Johnson', 'election_number' => 3]];
-
-        $candidateIds = [];
+        /*
+        |--------------------------------------------------------------------------
+        | CANDIDATES
+        |--------------------------------------------------------------------------
+        */
+        $candidates = [
+            ['name' => 'Kotak Kosong', 'election_number' => 1, 'kelas' => '-'],
+            ['name' => 'Alex Johnson - Richard Henry', 'election_number' => 2, 'kelas' => 'XII RPL 1'],
+            ['name' => 'Sarah Smith - David Johnson', 'election_number' => 3, 'kelas' => 'XII TKJ 2'],
+        ];
 
         foreach ($candidates as $candidate) {
-            $pictureFilename = Str::random(10).'.jpg';
-            $resumeFilename = Str::random(10).'.pdf';
 
-            $picturePath = 'candidate-pictures/'.$pictureFilename;
-            $resumePath = 'candidate-resumes/'.$resumeFilename;
+            $pictureFilename = Str::random(10) . '.jpg';
+            $resumeFilename  = Str::random(10) . '.pdf';
 
-            // download random image
-            $gender = $faker->randomElement(['men', 'women']);
-            // $imageUrl = "https://randomuser.me/api/portraits/{$gender}/" . rand(1, 99) . '.jpg';
-            $imageUrl = 'https://i.pravatar.cc/150?img='.rand(1, 70);
-            $imageContent = file_get_contents($imageUrl);
+            $picturePath = 'candidate-pictures/' . $pictureFilename;
+            $resumePath  = 'candidate-resumes/' . $resumeFilename;
 
-            // save to storage/public
-            Storage::disk('public')->put($picturePath, $imageContent);
+            // Generate dummy image
+            $imageUrl = 'https://i.pravatar.cc/150?img=' . rand(1, 70);
+            try {
+                $imageContent = file_get_contents($imageUrl);
+                Storage::disk('public')->put($picturePath, $imageContent);
+            } catch (\Exception $e) {
+                // Fallback jika internet mati/request gagal
+                Storage::disk('public')->put($picturePath, 'dummy content');
+            }
 
-            $pdf = Pdf::loadHTML('<h1>Fake Resume</h1><p>This is a dummy resume for testing.</p>');
+            // Generate dummy PDF
+            $pdf = Pdf::loadHTML('<h1>Fake Resume</h1><p>Resume pendaftaran untuk ' . $candidate['name'] . '</p>');
             Storage::disk('public')->put($resumePath, $pdf->output());
 
-            // create candidate
-            $created = Candidate::create([
-                'name' => $candidate['name'],
+            Candidate::create([
+                'name'            => $candidate['name'],
+                'kelas'           => $candidate['kelas'], // Menambahkan field kelas
                 'election_number' => $candidate['election_number'],
-                'picture' => $picturePath,
-                'resume' => $resumePath,
-                'total_voter' => 0,
+                'picture'         => $picturePath,
+                'resume'          => $resumePath,
+                'visi'            => $faker->sentence(10), // Menambahkan visi dummy
+                'misi'            => $faker->paragraph(3), // Menambahkan misi dummy
+                'total_voter'     => 0,
             ]);
-
-            $candidateIds[] = $created->id;
         }
 
-        // Create voters with choices
-        for ($i = 1; $i <= 50; $i++) {
-            $choice = $faker->randomElement($candidateIds);
+        /*
+        |--------------------------------------------------------------------------
+        | VOTERS (MANUAL)
+        |--------------------------------------------------------------------------
+        */
+        $voters = [
+            [
+                'name' => "Bagus Dwi Risnaldi",
+                'email' => "bdwirisnaldi@gmail.com",
+                'nisn' => '5520122099',
+            ],
+            [
+                'name' => "Aling",
+                'email' => "aling@gmail.com",
+                'nisn' => '5520122098',
+            ],
+            [
+                'name' => "Fauzy",
+                'email' => "fauzy@gmail.com",
+                'nisn' => '5520122100',
+            ],
+        ];
 
+        foreach ($voters as $voter) {
             User::create([
-                'name' => "Voter $i",
-                'email' => "voter$i@gmail.com",
-                'password' => bcrypt('password'),
-                'role' => 'Voter',
-                'choice' => $choice,
-            ]);
-
-            Candidate::where('id', $choice)->increment('total_voter');
-        }
-
-        // Create voters without choices
-        for ($i = 51; $i <= 100; $i++) {
-            User::create([
-                'name' => "Voter $i",
-                'email' => "voter$i@gmail.com",
-                'password' => bcrypt('password'),
-                'role' => 'Voter',
-                'choice' => null,
+                'name'     => $voter['name'],
+                'email'    => $voter['email'],
+                'nisn'     => $voter['nisn'],
+                'password' => bcrypt('12345678'),
+                'role'     => 'voter',
+                'choice'   => null,
             ]);
         }
     }

@@ -1,362 +1,170 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="id" class="scroll-smooth">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $title }}</title>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ $title }} | Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        midnight: '#2C3E50',
+                        darker: '#1A252F',
+                        accent: '#E74C3C',
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        :root {
-            --primary: #2c3e50;
-            --secondary: #3498db;
-            --accent: #e74c3c;
-            --light: #ecf0f1;
-            --dark: #2c3e50;
+        body { background-color: #1A252F; color: #ECF0F1; font-family: 'Inter', sans-serif; }
+        .bg-midnight-gradient { background: linear-gradient(135deg, #2C3E50 0%, #1A252F 100%); }
+        
+        /* Animasi Kotak Suara Custom */
+        .ballot-box-container {
+            perspective: 1000px;
         }
-
-        body {
-            background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        .voting-container {
-            max-width: 1000px;
-            width: 100%;
-        }
-
-        .card {
-            border: none;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-        }
-
-        .card-header {
-            background-color: var(--primary);
-            color: white;
-            text-align: center;
-            padding: 25px;
-            border-bottom: 4px solid var(--accent);
-        }
-
-        .icon-wrapper {
-            width: 80px;
-            height: 80px;
-            background-color: var(--accent);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 15px;
-            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
-        }
-
-        .form-control {
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            padding: 12px 20px;
-            height: auto;
-            background-color: #f8f9fa;
-            transition: all 0.3s;
-        }
-
-        .form-control:focus {
-            border-color: var(--secondary);
-            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
-        }
-
-        .input-group-text {
-            border: 2px solid #ddd;
-            border-right: none;
-            background-color: white;
-            border-radius: 10px 0 0 10px;
-        }
-
-        .input-group .form-control {
-            border-left: none;
-            border-radius: 0 10px 10px 0;
-        }
-
-        .btn-primary {
-            background-color: var(--accent);
-            border: none;
-            border-radius: 10px;
-            padding: 12px;
-            font-weight: 600;
-            letter-spacing: 1px;
-            box-shadow: 0 4px 6px rgba(231, 76, 60, 0.2);
-            transition: all 0.3s;
-        }
-
-        .btn-primary:hover {
-            background-color: #c0392b;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 8px rgba(231, 76, 60, 0.3);
-        }
-
-        .left-pane {
-            background-color: #f8f9fa;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .right-pane {
-            padding: 40px;
-            background-color: white;
-        }
-
-        .ballot-box {
+        .box-body {
+            background: #E74C3C;
+            width: 120px;
+            height: 90px;
+            border-radius: 8px;
             position: relative;
-            width: 200px;
-            height: 200px;
-            margin-bottom: 20px;
+            box-shadow: 0 10px 25px rgba(231, 76, 60, 0.3);
         }
-
-        .box {
-            width: 100%;
-            height: 160px;
-            background-color: var(--primary);
-            border-radius: 15px;
-            position: relative;
-            box-shadow: 0 5px 15px rgba(44, 62, 80, 0.3);
-            overflow: hidden;
-        }
-
         .box-slot {
-            width: 80%;
-            height: 15px;
-            background-color: #1a2530;
+            background: #1A252F;
+            height: 6px;
+            width: 70%;
+            margin: 0 auto;
             position: absolute;
-            top: 30px;
-            left: 10%;
-            border-radius: 5px;
-        }
-
-        .ballot {
-            position: absolute;
-            width: 50px;
-            height: 60px;
-            background-color: white;
-            border: 2px solid #ddd;
-            top: 0;
-            left: 75px;
-            transform-origin: center bottom;
-            animation: insertBallot 8s infinite ease-in-out;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .ballot:before {
-            content: '';
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            width: 25px;
-            height: 25px;
-            border: 2px solid var(--accent);
-            border-radius: 50%;
-        }
-
-        .ballot:after {
-            content: '';
-            position: absolute;
-            top: 16px;
-            left: 16px;
-            width: 13px;
-            height: 13px;
-            background-color: var(--accent);
-            border-radius: 50%;
-        }
-
-        .features {
-            margin-top: 30px;
-            text-align: center;
-        }
-
-        .features h4 {
-            color: var(--primary);
-            margin-bottom: 15px;
-            font-weight: 600;
-        }
-
-        .features p {
-            color: #7f8c8d;
-        }
-
-        .feature-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-            text-align: left;
-        }
-
-        .feature-icon {
-            width: 40px;
-            height: 40px;
-            background-color: rgba(52, 152, 219, 0.1);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--secondary);
-            margin-right: 15px;
-            font-size: 16px;
-        }
-
-        @keyframes insertBallot {
-            0% {
-                transform: translateY(-20px) rotate(-5deg);
-            }
-
-            20% {
-                transform: translateY(0) rotate(0);
-            }
-
-            25% {
-                transform: translateY(10px) rotate(0);
-                opacity: 1;
-            }
-
-            30% {
-                transform: translateY(80px) rotate(0);
-                opacity: 0;
-            }
-
-            40% {
-                transform: translateY(-20px) rotate(5deg);
-                opacity: 0;
-            }
-
-            50% {
-                transform: translateY(-20px) rotate(-5deg);
-                opacity: 1;
-            }
-
-            70% {
-                transform: translateY(0) rotate(0);
-            }
-
-            75% {
-                transform: translateY(10px) rotate(0);
-                opacity: 1;
-            }
-
-            80% {
-                transform: translateY(80px) rotate(0);
-                opacity: 0;
-            }
-
-            90% {
-                transform: translateY(-20px) rotate(5deg);
-                opacity: 0;
-            }
-
-            100% {
-                transform: translateY(-20px) rotate(-5deg);
-                opacity: 1;
-            }
-        }
-
-        .register-link {
-            color: var(--secondary);
-            font-weight: 500;
-            transition: all 0.3s;
-            text-decoration: none;
-        }
-
-        .register-link:hover {
-            color: var(--accent);
-        }
-
-        .alert {
+            top: 15px;
+            left: 15%;
             border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 20px;
+        }
+        .paper {
+            background: white;
+            width: 45px;
+            height: 55px;
+            position: absolute;
+            top: -40px;
+            left: 37px;
+            animation: dip 3s infinite ease-in-out;
+            z-index: -1;
+            border-radius: 2px;
+        }
+        @keyframes dip {
+            0%, 100% { transform: translateY(0); opacity: 0; }
+            20% { opacity: 1; }
+            50% { transform: translateY(50px); opacity: 0; }
         }
     </style>
 </head>
 
-<body>
-    <div class="container voting-container">
-        <div class="card">
-            <div class="card-header">
-                <div class="icon-wrapper">
-                    <i class="fas fa-vote-yea fa-2x text-white"></i>
-                </div>
-                <h3 class="mb-0">E-Voting System</h3>
-            </div>
+<body class="min-h-screen flex items-center justify-center p-4">
 
-            <div class="row g-0">
-                <!-- Left side with animation -->
-                <div class="col-lg-5 left-pane">
-                    <div class="ballot-box">
-                        <div class="ballot"></div>
-                        <div class="box">
-                            <div class="box-slot"></div>
+    <div class="fixed top-0 right-0 -mt-20 -mr-20 w-96 h-96 bg-accent/10 rounded-full blur-3xl -z-10"></div>
+    <div class="fixed bottom-0 left-0 -mb-20 -ml-20 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl -z-10"></div>
+
+    <div class="max-w-5xl w-full" data-aos="zoom-in">
+        <div class="bg-midnight rounded-2xl overflow-hidden shadow-[0_30px_60px_rgba(0,0,0,0.5)] border border-white/5">
+            <div class="flex flex-col lg:flex-row">
+                
+                <div class="lg:w-5/12 bg-midnight-gradient p-10 flex flex-col items-center justify-center border-b lg:border-b-0 lg:border-r border-white/5">
+                    
+                    <div class="ballot-box-container mb-10">
+                        <div class="relative">
+                            <div class="paper"></div>
+                            <div class="box-body">
+                                <div class="box-slot"></div>
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <i data-lucide="vote" class="text-white/20 w-10 h-10"></i>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="features">
-                        <h4>Secure Digital Voting</h4>
-                        <p class="text-muted mb-4">Your vote matters. Make it count securely.</p>
-
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <i class="fas fa-shield-alt"></i>
+                    <div class="text-center">
+                        <h2 class="text-3xl font-black italic uppercase tracking-tighter mb-4">
+                            Satu Suara <br> <span class="text-accent">Satu Perubahan.</span>
+                        </h2>
+                        
+                        <div class="space-y-4 mt-8">
+                            <div class="flex items-center gap-4 text-left group">
+                                <div class="bg-accent/10 p-2 rounded-lg group-hover:bg-accent/20 transition-colors">
+                                    <i data-lucide="shield-check" class="text-accent w-5 h-5"></i>
+                                </div>
+                                <p class="text-xs font-bold uppercase tracking-widest text-slate-400">Keamanan Terjamin</p>
                             </div>
-                            <div>
-                                <strong>End-to-end encryption</strong>
+                            <div class="flex items-center gap-4 text-left group">
+                                <div class="bg-accent/10 p-2 rounded-lg group-hover:bg-accent/20 transition-colors">
+                                    <i data-lucide="zap" class="text-accent w-5 h-5"></i>
+                                </div>
+                                <p class="text-xs font-bold uppercase tracking-widest text-slate-400">Hasil Real-Time</p>
                             </div>
-                        </div>
-
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <i class="fas fa-user-lock"></i>
-                            </div>
-                            <div>
-                                <strong>Verified voter authentication</strong>
-                            </div>
-                        </div>
-
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <i class="fas fa-chart-bar"></i>
-                            </div>
-                            <div>
-                                <strong>Real-time results</strong>
+                            <div class="flex items-center gap-4 text-left group">
+                                <div class="bg-accent/10 p-2 rounded-lg group-hover:bg-accent/20 transition-colors">
+                                    <i data-lucide="user-check" class="text-accent w-5 h-5"></i>
+                                </div>
+                                <p class="text-xs font-bold uppercase tracking-widest text-slate-400">Verifikasi Otomatis</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Right side with login form -->
-                <div class="col-lg-7 right-pane">
-                    @include('login.components.alert')
+                <div class="lg:w-7/12 bg-white p-8 lg:p-14 text-midnight">
+                    
+                    <div class="flex items-center gap-4 mb-10">
+                        <div class="bg-midnight p-2 rounded-xl">
+                            <img src="{{ Vite::asset('resources/assets/images/logo1.png') }}" alt="Logo" class="w-10 h-10 object-contain">
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-black uppercase italic tracking-tighter leading-none">E-Voting <span class="text-accent">SMAKDAKU</span></h1>
+                            <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400">Pemilihan OSIS Digital</p>
+                        </div>
+                    </div>
 
-                    @include('login.components.form')
+                    <div class="mb-6">
+                        @include('login.components.alert')
+                    </div>
+
+                    <div class="login-form">
+                        @include('login.components.form')
+                    </div>
+
+                    <div class="mt-10 pt-6 border-t border-slate-100 text-center">
+                        <p class="text-slate-400 text-xs font-medium uppercase tracking-widest">
+                            Bermasalah login? <br>
+                            <p class="text-midnight font-black transition-colors">Hubungi Administrator OSIS</p>
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="text-center mt-3">
-            <p class="text-white">© 2025 E-Voting System. All rights reserved.</p>
-        </div>
+        <p class="text-center mt-8 text-slate-500 text-[10px] font-bold uppercase tracking-[0.5em]">
+            © 2026 E-Voting SMAKDAKU. Digital Identity System.
+        </p>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src={{ asset('template/vendor/jquery/jquery.min.js') }}></script>
-    <script src={{ asset('template/vendor/jquery-easing/jquery.easing.min.js') }} defer></script>
-    <script src="{{ asset('template/js/sb-admin-2.min.js') }}" defer></script>
-</body>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="{{ asset('template/vendor/jquery/jquery.min.js') }}"></script>
+    <script>
+        lucide.createIcons();
+        AOS.init({
+            duration: 1000,
+            once: true
+        });
 
+        // Styling tambahan untuk input bawaan dari include form
+        $(document).ready(function() {
+            $('input').addClass('w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-accent focus:ring-0 outline-none transition-all mb-4 font-semibold text-midnight');
+            $('button[type="submit"]').addClass('w-full bg-accent hover:bg-darker text-white font-black py-4 rounded-xl uppercase tracking-widest shadow-lg shadow-accent/20 transition-all hover:-translate-y-1 active:translate-y-0');
+        });
+    </script>
+</body>
 </html>

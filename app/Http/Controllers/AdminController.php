@@ -16,7 +16,7 @@ class AdminController extends Controller
         $admins = User::where('role', 'admin')->get();
 
         return view('admin.index', [
-            'title' => 'E-Voting-HMPS | Admin List',
+            'title' => 'E-Voting-SMAKDAKU | Admin List',
             'admin' => $admins,
         ]);
     }
@@ -47,7 +47,7 @@ class AdminController extends Controller
 
         User::create($validatedData);
 
-        return redirect()->route('admin.index')->with('message', 'Data added successfully!');
+        return redirect()->route('admin.index')->with('message', 'Data berhasil ditambahkan!');
     }
 
     /**
@@ -87,16 +87,28 @@ class AdminController extends Controller
 
         $admins->update($validatedData);
 
-        return redirect()->route('admin.index')->with('message', 'Data updated successfully!');
+        return redirect()->route('admin.index')->with('message', 'Data sukses terupload!');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
-    {
-        User::destroy($id);
+    public function destroy($id)
+{
+    $candidate = Candidate::findOrFail($id);
 
-        return redirect()->route('admin.index')->with('message', 'Data deleted successfully!');
+    // 1. Hapus foto & berkas agar tidak membebani storage
+    if ($candidate->picture) {
+        Storage::delete('public/' . $candidate->picture);
     }
+    if ($candidate->resume) {
+        Storage::delete('public/' . $candidate->resume);
+    }
+
+    // 2. Gunakan forceDelete() jika Anda menggunakan SoftDeletes 
+    // agar nomor urut benar-benar hilang dari record database
+    $candidate->forceDelete(); 
+
+    return redirect()->back()->with('success', 'Kandidat berhasil dihapus permanen. Nomor urut kini tersedia kembali.');
+}
 }

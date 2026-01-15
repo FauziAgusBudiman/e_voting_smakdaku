@@ -1,6 +1,3 @@
-<x-layout>
-    <x-slot:title>{{ $title }}</x-slot:title>
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -52,6 +49,22 @@
 </head>
 <body class="min-h-screen pb-20">
 
+    <nav class="sticky top-0 z-50 bg-white shadow-sm py-4 px-8 flex justify-between items-center border-b border-gray-100">
+        <div class="flex items-center gap-3">
+            <div class="bg-red-500 p-2 rounded-lg">
+                <i data-lucide="shield-check" class="text-white w-5 h-5"></i>
+            </div>
+            <div>
+                <span class="block font-bold text-gray-800 tracking-tight leading-none">Admin<span class="text-red-500">Panel</span></span>
+                <span class="text-[9px] text-gray-400 font-bold uppercase tracking-widest">Verification System</span>
+            </div>
+        </div>
+        <div class="flex items-center gap-6">
+            <a href="/dashboard" class="text-xs font-bold text-gray-500 hover:text-red-500 transition-colors flex items-center gap-2">
+                <i data-lucide="layout-dashboard" class="w-4 h-4"></i> DASHBOARD
+            </a>
+        </div>
+    </nav>
 
     <main class="max-w-7xl mx-auto px-6 py-10">
         <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
@@ -70,8 +83,8 @@
                         <i data-lucide="users" class="text-red-500 w-6 h-6"></i>
                     </div>
                     <div>
-                        <span class="block text-[10px] uppercase font-bold text-gray-400 tracking-wider">Total Pendaftar</span>
-                        <span class="text-2xl font-bold text-gray-800">{{ count($candidates) }} <small class="text-xs font-normal text-gray-400">Siswa</small></span>
+                        <span class="block text-[10px] uppercase font-bold text-gray-400 tracking-wider">Total Applicants</span>
+                        <span class="text-2xl font-bold text-gray-800">{{ count($candidates) }} <small class="text-xs font-normal text-gray-400">Students</small></span>
                     </div>
                 </div>
             </div>
@@ -82,12 +95,12 @@
                 <table class="w-full text-left">
                     <thead>
                         <tr class="table-thead border-b border-gray-100">
-                        <th class="px-8 py-4 font-bold">Informasi Kandidat</th>
-                        <th class="px-8 py-4 font-bold">Tinjauan Konten</th>
-                        <th class="px-8 py-4 font-bold text-center">Status Saat Ini</th>
-                        <th class="px-8 py-4 font-bold text-center">Dokumen</th>
-                        <th class="px-8 py-4 font-bold text-center">Aksi</th>
-                    </tr>
+                            <th class="px-8 py-4 font-bold">Info Kandidat</th>
+                            <th class="px-8 py-4 font-bold">Content Review</th>
+                            <th class="px-8 py-4 font-bold text-center">Current Status</th>
+                            <th class="px-8 py-4 font-bold text-center">Documents</th>
+                            <th class="px-8 py-4 font-bold text-center">Quick Action</th>
+                        </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-50">
                         @forelse($candidates as $kandidat)
@@ -116,18 +129,18 @@
                             <td class="px-8 py-5">
                                 <button onclick="focusVisiMisi('{{ $kandidat->name }}', '{{ e($kandidat->visi) }}', '{{ e($kandidat->misi) }}')" 
                                         class="inline-flex items-center gap-2 bg-gray-100 hover:bg-red-50 text-gray-600 hover:text-red-600 px-4 py-2 rounded-lg text-[11px] font-bold transition-all border border-transparent hover:border-red-100">
-                                    <i data-lucide="eye" class="w-4 h-4"></i> Lihat Visi & Misi
+                                    <i data-lucide="eye" class="w-4 h-4"></i> View Vision & Mission
                                 </button>
                             </td>
 
                             <td class="px-8 py-5 text-center">
                                 @if($kandidat->election_number)
                                     <span class="inline-flex items-center bg-green-100 text-green-700 px-3 py-1 rounded-full text-[10px] font-bold border border-green-200 uppercase">
-                                        No Urut: {{ $kandidat->election_number }}
+                                        Ballot No: {{ $kandidat->election_number }}
                                     </span>
                                 @else
                                     <span class="inline-flex items-center bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-[10px] font-bold border border-yellow-200 uppercase">
-                                        Menunggu Persetujuan
+                                        Waiting Approval
                                     </span>
                                 @endif
                             </td>
@@ -165,7 +178,7 @@
                             <td colspan="5" class="py-20 text-center">
                                 <div class="flex flex-col items-center opacity-30">
                                     <i data-lucide="inbox" class="w-12 h-12 mb-3"></i>
-                                    <p class="font-bold text-sm uppercase tracking-widest">Tidak ada kandidat ditemukan</p>
+                                    <p class="font-bold text-sm uppercase tracking-widest">No candidates found</p>
                                 </div>
                             </td>
                         </tr>
@@ -180,7 +193,7 @@
                 <div class="flex justify-between items-center mb-8 border-b border-gray-100 pb-4">
                     <div>
                         <h2 id="view-name" class="text-2xl font-bold text-gray-800 tracking-tight leading-none"></h2>
-                        <span class="text-[10px] font-bold text-red-500 uppercase tracking-[0.2em] mt-2 block">Visi & Misi Kandidat</span>
+                        <span class="text-[10px] font-bold text-red-500 uppercase tracking-[0.2em] mt-2 block">Vision & Mission Preview</span>
                     </div>
                     <button onclick="document.getElementById('visi-misi-container').classList.add('hidden')" 
                             class="text-gray-400 hover:text-red-500 transition-colors">
@@ -192,7 +205,7 @@
                     <div class="space-y-4">
                         <div class="flex items-center gap-2 text-gray-800">
                             <i data-lucide="target" class="w-4 h-4 text-red-500"></i>
-                            <h3 class="text-xs font-bold uppercase tracking-widest">Visi Kandidat</h3>
+                            <h3 class="text-xs font-bold uppercase tracking-widest">Candidate Vision</h3>
                         </div>
                         <div class="bg-gray-50 p-6 rounded-2xl border border-gray-100 min-h-[150px]">
                             <p id="view-visi" class="text-gray-600 leading-relaxed text-sm italic"></p>
@@ -202,7 +215,7 @@
                     <div class="space-y-4">
                         <div class="flex items-center gap-2 text-gray-800">
                             <i data-lucide="list-checks" class="w-4 h-4 text-red-500"></i>
-                            <h3 class="text-xs font-bold uppercase tracking-widest">Misi Kandidat</h3>
+                            <h3 class="text-xs font-bold uppercase tracking-widest">Candidate Mission</h3>
                         </div>
                         <div class="bg-gray-50 p-6 rounded-2xl border border-gray-100 min-h-[150px]">
                             <p id="view-misi" class="text-gray-600 leading-relaxed text-sm italic whitespace-pre-line"></p>
@@ -243,17 +256,16 @@
 
         async function confirmVerify(id, name) {
             const { value: number } = await Swal.fire({
-                title: 'Verifikasi Kandidat',
-                text: `Setujui dan tetapkan nomor suara untuk ${name}?`,
+                title: 'Verify Candidate',
+                text: `Approve and assign a ballot number for ${name}?`,
                 input: 'number',
-                inputPlaceholder: 'Masukan Nomor (e.g. 1, 2, 3)',
+                inputPlaceholder: 'Enter ballot number (e.g. 1, 2, 3)',
                 showCancelButton: true,
                 confirmButtonColor: '#1cc88a',
                 cancelButtonColor: '#858796',
-                confirmButtonText: 'Setujui',
-                cancelButtonText: 'Batal',
+                confirmButtonText: 'APPROVE',
                 inputValidator: (value) => {
-                    if (!value) return 'Harus Mengisi Nomor!'
+                    if (!value) return 'You need to assign a number!'
                 }
             });
 
@@ -269,14 +281,13 @@
 
         function confirmDelete(id, name) {
             Swal.fire({
-                title: 'Hapus Pendaftar?',
-                text: `Anda akan menghapus secara permanen ${name} dari daftar.`,
+                title: 'Delete Application?',
+                text: `You are about to permanently remove ${name} from the list.`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#e74a3b',
                 cancelButtonColor: '#858796',
-                confirmButtonText: 'YA, HAPUS',
-                cancelButtonText: 'BATAL',
+                confirmButtonText: 'YES, DELETE',
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
@@ -287,9 +298,3 @@
     </script>
 </body>
 </html>
-
-    @include('components.alerts')
-
-    @include('candidate.components.table')
-
-</x-layout>

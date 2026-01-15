@@ -24,7 +24,7 @@ class VotersController extends Controller
         });
 
         return view('voters.index', [
-            'title' => 'E-Voting-HMPS | Voters List',
+            'title' => 'E-Voting-SMAKDAKU | Voters List',
             'voters' => $voters,
         ]);
     }
@@ -80,20 +80,31 @@ class VotersController extends Controller
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
-    {
-        $validatedData = $request->validate([
-            'name' => 'required',
-            'email' => 'required|unique:users,email,'.$id,
-        ]);
-        $voters = User::findOrFail($id);
-        if ($request->filled('password')) {
-            $validatedData['password'] = Hash::make($request->password);
-        }
+{
+    // 1. Validasi
+    $request->validate([
+        'name'  => 'required|string|max:255',
+        'email' => 'required|email|unique:users,email,' . $id,
+        'password' => 'nullable|min:6', // password boleh kosong (nullable)
+    ]);
 
-        $voters->update($validatedData);
+    $voter = User::findOrFail($id);
+    
+    // 2. Persiapkan data update
+    $data = [
+        'name'  => $request->name,
+        'email' => $request->email,
+    ];
 
-        return redirect()->route('voters.index')->with('message', 'Data updated successfully!');
+    // 3. Cek jika password diisi
+    if ($request->filled('password')) {
+        $data['password'] = Hash::make($request->password);
     }
+
+    $voter->update($data);
+
+    return redirect()->route('voters.index')->with('message', 'Voter updated successfully!');
+}
 
     /**
      * Remove the specified resource from storage.
@@ -155,7 +166,7 @@ class VotersController extends Controller
     public function exportPdf()
     {
         $voters = User::where('role', 'voter')->get()->map(function ($user, $index) {
-            $status = $user->choice !== null ? 'Voted' : 'Not Voted';
+            $status = $user->choice !== null ? 'Memilih' : 'Belum Memilih';
             $user->status = $status;
             $user->number = $index + 1;
 
@@ -185,7 +196,8 @@ class VotersController extends Controller
         $columns = [
             'A' => 'name',
             'B' => 'email',
-            'C' => 'password'
+            'C' => 'nisn',
+            'D' => 'password'
         ];
 
         // Iterate through each row in the worksheet
@@ -206,17 +218,53 @@ class VotersController extends Controller
         return redirect()->route('voters.index')->with('message', 'Data berhasil diimpor!');
     }
 
-    public function massDelete(Request $request)
+
+    public function destroy($id)
     {
-        $request->validate([
-            'selected_ids' => 'required|array',
-            'selected_ids.*' => 'exists:users,id'
-        ]);
+        // 1. Cari user atau kembalikan 404 jika tidak ada
+        $voter = User::findOrFail($id);
 
-        $selectedIds = $request->input('selected_ids', []);
-        $deletedCount = User::whereIn('id', $selectedIds)->delete();
+        // 2. Keamanan: Mencegah admin menghapus dirinya sendiri
+        if (auth()->id() == $id) {
+            return redirect()->back()->with('error', 'Anda tidak dapat menghapus akun Anda sendiri yang sedang aktif.');
+        }
 
-        return redirect()->route('voters.index')->with('message', $deletedCount . ' voters deleted successfully!');
+        try {
+            // 3. Hapus data
+            $voter->delete();
+
+            return redirect()->back()->with('success', 'Data pemilih "' . $voter->name . '" berhasil dihapus.');
+        } catch (\Exception $e) {
+            // Jika terjadi error database (misal: data berelasi)
+            return redirect()->back()->with('error', 'Gagal menghapus data: Terjadi kesalahan sistem.');
+        }
     }
 
+
+   public function massDelete(Request $request)
+{
+    // 1. Ambil data dari request (sesuaikan dengan name di HTML: selected_ids)
+    $ids = $request->input('selected_ids');
+
+    // 2. Validasi: Jika tidak ada data yang dipilih
+    if (!$ids || count($ids) === 0) {
+        return redirect()->back()->with('error', 'Pilih minimal satu data untuk dihapus.');
+    }
+
+    try {
+        // 3. Keamanan: Jangan hapus diri sendiri jika Admin terpilih
+        $ids = array_diff($ids, [auth()->id()]);
+
+        if (empty($ids)) {
+            return redirect()->back()->with('error', 'Tidak ada data valid yang bisa dihapus.');
+        }
+
+        // 4. Eksekusi Hapus
+        $deletedCount = \App\Models\User::whereIn('id', $ids)->delete();
+
+        return redirect()->back()->with('success', $deletedCount . ' data pemilih berhasil dihapus.');
+    } catch (\Exception $e) {
+        return redirect()->back()->with('error', 'Terjadi kesalahan sistem saat menghapus data.');
+    }
+}
 }
